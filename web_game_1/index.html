@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+    <meta name="theme-color" content="#111a1b">
+    <meta name="description" content="Explore, fight, and survive in the endless frontier of memaybeo.">
+    <title>memaybeo — The Wilds</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="src/main.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="memaybeo home">
+          <span class="brand-mark">m<span>·</span>b</span>
+          <span class="brand-name">memaybeo<span class="brand-sub" data-i18n="brandSub">FRONTIER SURVIVAL</span></span>
+        </a>
+        <div class="world-label"><span class="world-dot"></span><span data-i18n="region" id="region-label">PINE RIDGE</span></div>
+        <button id="audio-toggle" class="audio-toggle" type="button" aria-label="Tắt âm thanh" aria-pressed="true" title="Tắt âm thanh">♫</button>
+        <button id="language-toggle" class="language-toggle" type="button" aria-label="Switch to Vietnamese">VI</button>
+      </header>
+
+      <section class="game-layout" aria-label="Side-scrolling survival game">
+        <div class="game-column">
+          <div class="mobile-hud" aria-label="Player status">
+            <div class="mobile-vitals">
+              <svg class="mobile-portrait" viewBox="0 0 40 48" role="img" aria-label="Nova Reyes">
+                <path fill="#344b40" d="M0 48 8 26l7 12 9-20 8 18 5-9 5 11v10z"/>
+                <path fill="#657256" d="M4 48q2-15 9-17h13q8 3 10 17z"/>
+                <path fill="#c18d6c" d="M13 17q0-10 7-11 8 1 8 12l-2 8q-2 5-6 5-6 0-7-8z"/>
+                <path fill="#292b27" d="M11 18Q9 7 18 4q11-1 12 11l-4 2-2-7q-5 5-12 4v8l-2 2z"/>
+                <path fill="none" stroke="#d5bd83" stroke-width="1.5" d="M12 16h4m11 0h-4"/>
+              </svg>
+              <span class="heart-row" id="hearts" aria-label="20 out of 20 hearts"></span><span class="hud-health" id="health-label">20 / 20</span>
+            </div>
+            <div class="mobile-ammo"><img class="mobile-akm" src="assets/akm-reference.png" alt="AKM"><b id="ammo-current">30</b><span>/ 30</span><span class="reserve">∞</span></div>
+            <div class="fps-pill"><span>FPS</span><b id="fps-counter">--</b></div>
+          </div>
+
+          <div class="game-frame" id="game-frame">
+            <canvas id="game" width="960" height="540" aria-label="Side-scrolling world. Explore and fight roaming bots." data-i18n-aria="controls"></canvas>
+            <div class="game-hud">
+              <div class="desktop-vitals"><span class="hud-caption" data-i18n="vitals">VITALS</span><span class="heart-row" id="desktop-hearts" aria-hidden="true"></span><span class="hud-health" id="desktop-health">20 / 20</span></div>
+              <div class="hud-center"><span data-i18n="day">DAY</span> <b id="hud-day">01</b><span class="hud-separator"></span><span id="clock">08:00 AM</span></div>
+              <div class="hud-right"><span class="hud-caption">FPS</span><b id="desktop-fps">--</b><span class="hud-separator"></span><span id="coordinate">PINE RIDGE · 000 M</span></div>
+            </div>
+            <div class="screen-overlay" id="start-screen">
+              <div class="intro-card">
+                <div class="intro-kicker" data-i18n="startKicker">FIELD NOTES · THE NORTHERN FRONTIER</div>
+                <h1><span data-i18n="titleLineOne">FIND YOUR</span><br><em data-i18n="titleLineTwo">OWN WAY.</em></h1>
+                <p data-i18n="startText">A world beyond the outpost. Wild terrain, old ruins, and machines still roaming the woods.</p>
+                <button class="primary-button" id="start-button"><span data-i18n="startButton">STEP INTO THE WILDS</span><span aria-hidden="true">→</span></button>
+                <div class="intro-hint"><kbd>A</kbd><kbd>D</kbd> <span data-i18n="move">MOVE</span><i>·</i><kbd>SPACE</kbd> <span data-i18n="jump">JUMP</span><i>·</i><kbd>E</kbd> <span data-i18n="fire">FIRE</span><i>·</i><kbd>R</kbd> <span data-i18n="reloadLabel">RELOAD</span></div>
+              </div>
+            </div>
+            <div class="screen-overlay hidden" id="end-screen">
+              <div class="intro-card end-card">
+                <div class="intro-kicker" data-i18n="noTitle">YOUR STORY CONTINUES</div>
+                <h1><span data-i18n="retryTitle">BACK TO</span><br><em data-i18n="retryTitleTwo">THE WILDS.</em></h1>
+                <p id="end-copy">You made it a little farther this time.</p>
+                <button class="primary-button" id="restart-button"><span data-i18n="retry">TRY AGAIN</span><span aria-hidden="true">→</span></button>
+                <div class="intro-hint"><span data-i18n="distanceWalked">DISTANCE WALKED</span> <b id="final-score">0 M</b></div>
+              </div>
+            </div>
+            <div class="toast hidden" id="toast" role="status"></div>
+            <div class="touch-controls" id="touch-controls" aria-label="Touch controls" data-i18n-aria="controls">
+              <div class="stick-zone" id="stick-zone" aria-label="Move joystick" data-i18n-aria="aimLabel"><div class="stick-base"><span id="stick-knob"></span></div></div>
+              <div class="touch-actions">
+                <button class="touch-button jump-button" id="jump-button" aria-label="Jump" data-i18n-aria="jump"><span>↑</span><small data-i18n="jump">JUMP</small></button>
+                <button class="touch-button fire-button" id="fire-button" aria-label="Fire weapon" data-i18n-aria="fire"><span>✣</span><small data-i18n="fire">FIRE</small></button>
+                <button class="touch-button reload-button" id="reload-button" aria-label="Reload weapon" data-i18n-aria="reloadLabel"><span>↻</span><small data-i18n="reloadLabel">RELOAD</small></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="under-bar">
+            <span class="status-message" id="status-text" data-i18n="startStatus">A NEW FRONTIER AWAITS</span>
+            <div class="world-progress"><span id="distance-label">0 M</span><span class="progress-track"><i id="progress-fill"></i></span><span data-i18n="stageClear">NEXT MILESTONE</span></div>
+          </div>
+        </div>
+
+        <aside class="desktop-panel" aria-label="Player loadout and run statistics">
+          <section class="operator-card">
+            <div class="panel-heading" data-i18n="operative">OPERATIVE</div>
+            <div class="operator-profile">
+              <div class="portrait-frame">
+                <svg viewBox="0 0 120 144" role="img" aria-label="Nova Reyes, frontier scout">
+                  <defs>
+                    <linearGradient id="portrait-bg" x2="0" y2="1"><stop stop-color="#425e50"/><stop offset="1" stop-color="#1f302c"/></linearGradient>
+                    <linearGradient id="jacket" x2="0" y2="1"><stop stop-color="#788364"/><stop offset="1" stop-color="#3d493d"/></linearGradient>
+                  </defs>
+                  <rect width="120" height="144" fill="url(#portrait-bg)"/>
+                  <path d="M0 119 25 76l18 28 25-42 31 44 17-24 18 26v36H0z" fill="#344b40"/>
+                  <path d="M16 144q5-42 28-48h32q25 9 30 48" fill="url(#jacket)"/>
+                  <path d="m44 92 16 28 17-28-12-9H54z" fill="#c8b894"/>
+                  <path d="m54 101 6 14 7-14-7-7z" fill="#3d4940"/>
+                  <path d="M41 51q0-31 20-34 23 2 24 35l-5 25q-5 16-19 16-16 0-20-24z" fill="#c18d6c"/>
+                  <path d="M36 52Q29 18 57 9q31-3 34 34l-8 7-5-23Q62 43 42 39l-2 24-5 7z" fill="#292b27"/>
+                  <path d="M46 53h12m8 0h12" stroke="#302b27" stroke-width="3" stroke-linecap="round"/>
+                  <path d="m58 63 4 2 4-2" fill="none" stroke="#8b5b49" stroke-width="1.5"/>
+                  <path d="M37 49h8m39 0h-8" stroke="#d5bd83" stroke-width="2"/>
+                  <path d="M28 47h12m52 0H80" stroke="#a89561" stroke-width="3"/>
+                  <path d="m31 48 5 13m53-13-5 13" stroke="#c5b27a" stroke-width="2"/>
+                  <path d="M38 107h44v31H38z" fill="#4d5948"/>
+                  <path d="m43 108 13 9-10 7-7-9m38-7-13 9 10 7 7-9" fill="#687354"/>
+                  <path d="M27 137h67" stroke="#a8996c" stroke-width="2"/>
+                </svg>
+              </div>
+              <div class="operator-copy"><h2>NOVA REYES</h2><p><span data-i18n="rangerClass">RANGER CLASS</span><br><span data-i18n="scout">SCOUT</span> · 0047</p></div>
+            </div>
+            <div class="stat-grid">
+              <div><span data-i18n="kills">HOSTILES CLEARED</span><b id="kill-count">000</b></div>
+              <div><span data-i18n="bestDistance">BEST DISTANCE</span><b id="best-distance">0 M</b></div>
+              <div><span data-i18n="nearbyBots">BOTS NEARBY</span><b id="bot-count">00</b></div>
+            </div>
+          </section>
+
+          <section class="weapon-card">
+            <div class="panel-heading"><span data-i18n="equipped">EQUIPPED</span><span class="live-dot"></span></div>
+            <canvas class="weapon-preview" id="weapon-preview" width="320" height="96" role="img" aria-label="AKM rifle with wooden stock and curved magazine"></canvas>
+            <div class="weapon-info"><div><b>AKM</b><span data-i18n="assaultRifle">ASSAULT RIFLE</span></div><span class="round-count"><b id="magazine-label">30</b><small> / 30</small></span></div>
+            <div class="mag-track"><i id="ammo-bar"></i></div>
+            <div class="weapon-detail"><span data-i18n="caliber">7.62 × 39 MM</span><span id="reload-label">INFINITE RESERVE</span></div>
+          </section>
+        </aside>
+      </section>
+    </main>
+  </body>
+</html>
